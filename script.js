@@ -1,40 +1,54 @@
-/* Reset básico */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particlesArray = [];
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+    }
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if(this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if(this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+    }
+    draw() {
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
-body, html {
-    height: 100%;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-    background-color: #1E90FF; /* azul */
+function init() {
+    particlesArray = [];
+    for(let i = 0; i < 100; i++) {
+        particlesArray.push(new Particle());
+    }
 }
+init();
 
-.container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    text-align: center;
+function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particlesArray.forEach(p => {
+        p.update();
+        p.draw();
+    });
+    requestAnimationFrame(animate);
 }
+animate();
 
-h1 {
-    font-size: 4rem;
-    z-index: 10;
-    text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-}
-
-/* Canvas de partículas */
-#particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    init();
+});
